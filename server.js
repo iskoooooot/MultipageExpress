@@ -1,12 +1,14 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Serve static files from the "public" folder
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve the data folder so the blog can fetch the posts
+app.use('/data', express.static(path.join(__dirname, 'data')));
 
 // Define routes for different pages
 app.get('/', (req, res) => {
@@ -21,20 +23,16 @@ app.get('/contact', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'contact.html'));
 });
 
-// Serve blog page dynamically
 app.get('/blog', (req, res) => {
-    const postsPath = path.join(__dirname, 'data', 'posts.json');
-    fs.readFile(postsPath, 'utf8', (err, data) => {
-        if (err) {
-            res.status(500).send('Error reading blog posts');
-            return;
-        }
-        const posts = JSON.parse(data);
-        res.render('blog', { posts });
-    });
+    res.sendFile(path.join(__dirname, 'views', 'blog.html'));
 });
+
+// Fallback route for 404 errors
+app.use((req, res) => {
+    res.status(404).send('Page not found');
+});
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
 });
-

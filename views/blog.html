@@ -8,24 +8,31 @@
 </head>
 <body>
     <h1>Blog Posts</h1>
-    <div id="blog-posts"></div>
+    <div id="posts"></div>
 
     <script>
-        // Fetch blog posts dynamically
-        fetch('/data/posts.json')
-            .then(response => response.json())
+        // Fetch the posts from the correct path
+        fetch('/data/post.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch posts');
+                }
+                return response.json();
+            })
             .then(posts => {
-                const blogContainer = document.getElementById('blog-posts');
+                const postsDiv = document.getElementById('posts');
                 posts.forEach(post => {
-                    blogContainer.innerHTML += `
-                        <div>
-                            <h2>${post.title}</h2>
-                            <p>${post.content}</p>
-                        </div>
+                    postsDiv.innerHTML += `
+                        <h2>${post.title}</h2>
+                        <p>${post.content}</p>
+                        <hr>
                     `;
                 });
             })
-            .catch(error => console.error('Error loading blog posts:', error));
+            .catch(err => {
+                console.error('Error loading posts:', err);
+                document.getElementById('posts').innerHTML = `<p>Error loading blog posts. Please try again later.</p>`;
+            });
     </script>
 </body>
 </html>
